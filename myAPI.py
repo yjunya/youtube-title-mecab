@@ -4,7 +4,7 @@ import random
 from flask import Flask, jsonify, abort, make_response
 
 
-G = None
+#G = None
 #import useMecab
 
 # Flask
@@ -13,8 +13,8 @@ app.config['JSON_AS_ASCII'] = False
 # HTTP GET
 @app.route('/random', methods=['GET'])
 def random_select():
-    if G == None:
-        G = nx.read_edgelist('result', delimiter=',', nodetype=str)
+#    if G == None:
+    G = nx.read_edgelist('result', delimiter=',', nodetype=str)
 
     ans = nx.pagerank(G,0.9)
 
