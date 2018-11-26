@@ -3,6 +3,8 @@ import networkx as nx
 import random
 from flask import Flask, jsonify, abort, make_response
 
+
+G = None
 #import useMecab
 
 # Flask
@@ -11,7 +13,8 @@ app.config['JSON_AS_ASCII'] = False
 # HTTP GET
 @app.route('/random', methods=['GET'])
 def random_select():
-    G = nx.read_edgelist('result', delimiter=',', nodetype=str)
+    if G == None:
+        G = nx.read_edgelist('result', delimiter=',', nodetype=str)
 
     ans = nx.pagerank(G,0.9)
 
