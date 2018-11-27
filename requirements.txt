@@ -8,4 +8,4 @@ Jinja2==2.10
 MarkupSafe==1.1.0
 networkx==2.2
 Werkzeug==0.14.1
-git+git://github.com/yjunya/heroku-mecab-test.git
+git+git://github.com/yjunya/heroku-mecab-python3.git
