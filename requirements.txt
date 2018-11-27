@@ -8,4 +8,6 @@ Jinja2==2.10
 MarkupSafe==1.1.0
 networkx==2.2
 Werkzeug==0.14.1
+typing==3.6.4
+pandas==0.23.0
 git+git://github.com/yjunya/heroku-mecab-python3.git
