@@ -13,7 +13,7 @@ G = None
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 # HTTP GET
-@app.route('/random', methods=['GET'])
+@app.route('/random')
 def random_select():
     global G
     if G == None:
@@ -58,8 +58,9 @@ def random_select():
         return make_response(jsonify(result))
 
 
-#@app.route('/search', methods=['GET'])
-#def search():
+@app.route('/search/<q>', methods=['GET'])
+def search(q):
+    return make_response(jsonify(q))
 #    kusa = re.compile(r'^[wWｗＷ]+$')
 #    def is_kusa(s):
 #        return kusa.match(s) is not None
