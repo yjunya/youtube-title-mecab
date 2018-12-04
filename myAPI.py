@@ -59,7 +59,32 @@ def random_select():
 
 @app.route('/search/<q>', methods=['GET'])
 def search(q):
-    return make_response(jsonify(q))
+    YOUTUBE_API_KEY = os.environ['YOUTUBE_API_KEY']
+    youtube = build('youtube','v3',developerKey=YOUTUBE_API_KEY)
+    mp = MeCabParser()
+    query = q
+
+    search_response = youtube.search().list(
+        part='snippet',
+        q=query,
+        type='video',
+        maxResults=1
+    ).execute()
+
+    for item in search_response['items']:
+        title = item['snippet']['title']
+
+        try:
+            df = mp.parse(title)
+        except:
+            continue
+
+        word_of_movie = []
+
+        for i in range(len(df)):
+            word_of_movie.append(df['surface_form'][i])
+
+    return make_response(jsonify(word_of_movie))
 #    kusa = re.compile(r'^[wWｗＷ]+$')
 #    def is_kusa(s):
 #        return kusa.match(s) is not None
