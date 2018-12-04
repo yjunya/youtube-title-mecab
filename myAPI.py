@@ -4,7 +4,6 @@ import random
 from flask import Flask, jsonify, abort, make_response
 
 
-
 G = None
 
 #import useMecab
