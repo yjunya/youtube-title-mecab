@@ -7,39 +7,33 @@ from apiclient.discovery import build
 from flask import Flask, jsonify, abort, make_response
 
 
-#initial
+# initial for check
 kusa = re.compile(r'^[wWｗＷ]+$')
 def is_kusa(s):
     return kusa.match(s) is not None
-
 alnumReg = re.compile(r'^[a-zA-Z0-9]+$')
 def isalnum(s):
     return alnumReg.match(s) is not None
-
 isetu = re.compile(r'^い説$')
 def is_isetu(s):
     return isetu.match(s) is not None
 
+# initial for graph
 G = None
 
 
-# Flask
+# initial Flask
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
-# HTTP GET
+
+# words of random
 @app.route('/random')
 def random_select():
     global G
     if G == None:
         G = nx.read_edgelist('result', delimiter=',', nodetype=str)
 
-    ans = nx.pagerank(G,0.9)
-
-    ans = [[key,value] for key, value in ans.items()]
-    ans = sorted(ans, key=lambda x: x[1], reverse=True)
-
-    #print(ans[random.randint(0,num-1)][0])
-    random_word = random.choice(ans)[0]
+    random_word = random.choice(list(G.nodes))
 
     personalization_dict = {}
     name = [random_word]
@@ -56,11 +50,7 @@ def random_select():
     ans = [[key,value] for key, value in ans.items()]
     ans = sorted(ans, key=lambda x: x[1], reverse=True)
 
-    ans2 = []
-    for i in range(number):
-        ans2.append(ans[i][0])
-
-    result = random.sample(ans2,4)
+    result = [i[0] for i in random.sample(ans[0:number],4)]
 
     if random_word in result:
         result.remove(random_word)
@@ -71,7 +61,7 @@ def random_select():
         result.pop(-1)
         return make_response(jsonify(result))
 
-
+# words of search
 @app.route('/search/<q>', methods=['GET'])
 def search(q):
     #search query
@@ -84,8 +74,10 @@ def search(q):
         part='snippet',
         q=query,
         type='video',
-        maxResults=1
+        maxResults=10
     ).execute()
+
+    word_of_movie = []
 
     for item in search_response['items']:
         title = item['snippet']['title']
@@ -95,7 +87,6 @@ def search(q):
         except:
             continue
 
-        word_of_movie = []
 
         for i in range(len(df)):
             if is_kusa(df['surface_form'][i]) == True:
@@ -107,14 +98,47 @@ def search(q):
 
                 word_of_movie.append(df['surface_form'][i])
 
+    #create graph H
+    H = nx.Graph()
+    for word in word_of_movie:
+        if word != query:
+            H.add_edge(query,word)
+
     #combine graph
-#    global G
-#    if G == None:
-#        G = nx.read_edgelist('result', delimiter=',', nodetype=str)
+    global G
+    if G == None:
+        G = nx.read_edgelist('result', delimiter=',', nodetype=str)
 
+    F = nx.compose(G,H)
 
-    return make_response(jsonify(word_of_movie))
+    #personalized pagerank for query
+    personalization_dict = {}
+    number = 50
 
+    for key in F:
+        personalization_dict[key] = 0
+        if key == query:
+            personalization_dict[key] = 1
+
+    ans = nx.pagerank(G=F, alpha=0.9, personalization=personalization_dict)
+
+    ans = [[key,value] for key, value in ans.items()]
+    ans = sorted(ans, key=lambda x: x[1], reverse=True)
+
+    result = [i[0] for i in random.sample(ans[0:number],4)]
+
+    if query in result:
+        result.remove(query)
+        result.insert(0, query)
+        return make_response(jsonify(result))
+    else:
+        result.insert(0, query)
+        result.pop(-1)
+        return make_response(jsonify(result))
+
+    return make_response(jsonify(result))
+
+# error
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
