@@ -8,7 +8,6 @@ httplib2==0.12.0
 itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.0
-mecab-python3==0.996.1
 networkx==2.2
 numpy==1.15.4
 oauth2client==4.1.3
