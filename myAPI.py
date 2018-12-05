@@ -1,10 +1,22 @@
 import os
+import re
 import networkx as nx
 import random
 from mecab_pandas import MeCabParser
 from apiclient.discovery import build
 from flask import Flask, jsonify, abort, make_response
 
+kusa = re.compile(r'^[wWｗＷ]+$')
+def is_kusa(s):
+    return kusa.match(s) is not None
+
+alnumReg = re.compile(r'^[a-zA-Z0-9]+$')
+def isalnum(s):
+    return alnumReg.match(s) is not None
+
+isetu = re.compile(r'^い説$')
+def is_isetu(s):
+    return isetu.match(s) is not None
 
 
 G = None
@@ -84,7 +96,14 @@ def search(q):
         word_of_movie = []
 
         for i in range(len(df)):
-            word_of_movie.append(df['surface_form'][i])
+            if is_kusa(df['surface_form'][i]) == True:
+                df['surface_form'][i] = "草(www)"
+
+            if df['word_class'][i] == "名詞" and df['class_detail1'][i] != "非自立" and df['class_detail1'][i] != "数" and isalnum(df['surface_form'][i]) == False:
+                if is_isetu(df['surface_form'][i]) == True:
+                    df['surface_form'][i] = "説"
+
+                word_of_movie.append(df['surface_form'][i])
 
     return make_response(jsonify(word_of_movie))
 #    kusa = re.compile(r'^[wWｗＷ]+$')
