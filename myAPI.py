@@ -7,6 +7,7 @@ from apiclient.discovery import build
 from flask import Flask, jsonify, abort, make_response
 
 
+
 # initial for check
 kusa = re.compile(r'^[wWｗＷ]+$')
 def is_kusa(s):
@@ -137,6 +138,7 @@ def search(q):
         return make_response(jsonify(result))
 
     return make_response(jsonify(result))
+
 
 # error
 @app.errorhandler(404)
