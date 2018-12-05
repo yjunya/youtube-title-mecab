@@ -15,9 +15,8 @@ class MeCabParser:
 
     def __init__(self) -> None:
         """Neologdが存在するディレクトリを探し、MeCabのParserを定義する."""
-        try:
-            neolog_dir = subprocess.getoutput("echo `mecab-config --dicdir`\"/mecab-ipadic-neologd\"")
-        except:
+        neolog_dir = subprocess.getoutput("echo `mecab-config --dicdir`\"/mecab-ipadic-neologd\"")
+        if neolog_dir == "bash: mecab-config: command not found\n/mecab-ipadic-neologd":
             neolog_dir = "/app/.linuxbrew/lib/mecab/dic/mecab-ipadic-neologd"
         self.mecab = MeCab.Tagger("-d {}".format(neolog_dir))
 
