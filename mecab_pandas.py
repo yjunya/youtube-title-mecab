@@ -16,7 +16,7 @@ class MeCabParser:
     def __init__(self) -> None:
         """Neologdが存在するディレクトリを探し、MeCabのParserを定義する."""
 #        neolog_dir = subprocess.getoutput("echo `mecab-config --dicdir`\"/mecab-ipadic-neologd\"")
-#        neolog_dir = "/app/.linuxbrew/lib/mecab/dic/mecab-ipadic-neologd"
+        neolog_dir = "/app/.linuxbrew/lib/mecab/dic/mecab-ipadic-neologd"
         self.mecab = MeCab.Tagger("-d {}".format(neolog_dir))
 
     def parse(self, target: str) -> pd.DataFrame:
