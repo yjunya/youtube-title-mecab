@@ -4,7 +4,7 @@ import networkx as nx
 import random
 from mecab_pandas import MeCabParser
 from apiclient.discovery import build
-from flask import Flask, jsonify, abort, make_response
+from flask import Flask, jsonify, abort, make_response, request
 
 
 
@@ -137,7 +137,36 @@ def search(q):
         result.pop(-1)
         return make_response(jsonify(result))
 
-    return make_response(jsonify(result))
+
+# get movie
+@app.route('/movie', methods=['GET'])
+def get_movie():
+
+    words = request.args.get('words')
+    return make_response(jsonify(words))
+
+
+    query = ""
+    for word in words:
+        query += word
+        query += " "
+
+    YOUTUBE_API_KEY = os.environ['YOUTUBE_API_KEY']
+    youtube = build('youtube','v3',developerKey=YOUTUBE_API_KEY)
+
+    movieIDs = []
+
+    search_response = youtube.search().list(
+        part='id',
+        q=query,
+        type='video',
+        maxResults=5
+    ).execute()
+
+    for item in search_response['items']:
+        movieIDs.append(item['id']['videoId'])
+
+    return make_response(jsonify(movieIDs))
 
 
 # error
