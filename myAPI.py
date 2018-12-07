@@ -5,6 +5,8 @@ import random
 from mecab_pandas import MeCabParser
 from apiclient.discovery import build
 from flask import Flask, jsonify, abort, make_response
+from flask_cors import CORS
+
 
 
 
@@ -26,6 +28,7 @@ G = None
 # initial Flask
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+CORS(app)
 
 # words of random
 @app.route('/random')
