@@ -22,6 +22,29 @@ def is_isetu(s):
 # initial for graph
 G = None
 
+# listのもっとも多い要素を返す
+def maxElem( lis ):
+  '''
+  与えられたリストの中に、最も多く存在する要素を返す
+  (最大の数の要素が複数ある場合、pythonのsetで先頭により近い要素を返す)
+  '''
+  L = lis[:]#copy
+  S = set(lis)
+  S = list(S)
+  MaxCount=0
+  ret='nothing...'
+
+  for elem in S:
+    c=0
+    while elem in L:
+      ind = L.index(elem)
+      foo = L.pop(ind)
+      c+=1
+    if c>MaxCount:
+      MaxCount=c
+      ret = elem
+  return ret
+
 
 # initial Flask
 app = Flask(__name__)
@@ -80,8 +103,13 @@ def search(q):
     ).execute()
 
     word_of_movie = []
+    movieIDs = []
+    movieIDs_text = ""
+
 
     for item in search_response['items']:
+        # get_movieIDs for get category
+        movieIDs.append(item['id']['videoId'])
         title = item['snippet']['title']
 
         try:
@@ -132,13 +160,27 @@ def search(q):
     if query in result:
         result.remove(query)
         result.insert(0, query)
-        return make_response(jsonify(result))
     else:
         result.insert(0, query)
         result.pop(-1)
-        return make_response(jsonify(result))
 
-    return make_response(jsonify(result))
+    # get_category
+    for movieID in movieIDs:
+        movieIDs_text += movieID
+        movieIDs_text += ","
+
+    search_response = youtube.videos().list(
+        part='snippet',
+        id=movieIDs_text
+    ).execute()
+
+    categoryIDs = []
+
+    for item in search_response['items']:
+        categoryIDs.append(item['snippet']['categoryId'])
+
+    final_result = {"words":result ,"categoryID":maxElem(categoryIDs) }
+    return make_response(jsonify(final_result))
 
 
 # error
