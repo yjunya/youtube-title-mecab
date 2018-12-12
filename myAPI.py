@@ -184,7 +184,7 @@ def search():
     for item in search_response['items']:
         categoryIDs.append(item['snippet']['categoryId'])
 
-    final_result = {"words":result ,"categoryID":maxElem(categoryIDs) }
+    final_result = {"words":result ,"categoryId":maxElem(categoryIDs) }
     return make_response(jsonify(final_result))
 
 
