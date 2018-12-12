@@ -8,8 +8,6 @@ from flask import Flask, jsonify, abort, make_response
 from flask_cors import CORS
 
 
-
-
 # initial for check
 kusa = re.compile(r'^[wWｗＷ]+$')
 def is_kusa(s):
