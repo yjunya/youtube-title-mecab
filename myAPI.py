@@ -4,7 +4,7 @@ import networkx as nx
 import random
 from mecab_pandas import MeCabParser
 from apiclient.discovery import build
-from flask import Flask, jsonify, abort, make_response
+from flask import Flask, jsonify, abort, make_response, request
 from flask_cors import CORS
 
 
@@ -21,6 +21,9 @@ def is_isetu(s):
 
 # initial for graph
 G = None
+
+#initial for youtube
+youtube = None
 
 # listのもっとも多い要素を返す
 def maxElem( lis ):
@@ -87,13 +90,15 @@ def random_select():
         return make_response(jsonify(result))
 
 # words of search
-@app.route('/search/<q>', methods=['GET'])
-def search(q):
+@app.route('/search', methods=['GET'])
+def search():
     #search query
-    YOUTUBE_API_KEY = os.environ['YOUTUBE_API_KEY']
-    youtube = build('youtube','v3',developerKey=YOUTUBE_API_KEY)
+    global youtube
+    if youtube == None:
+        YOUTUBE_API_KEY = os.environ['YOUTUBE_API_KEY']
+        youtube = build('youtube','v3',developerKey=YOUTUBE_API_KEY)
     mp = MeCabParser()
-    query = q
+    query = request.args.get('word')
 
     search_response = youtube.search().list(
         part='snippet',
