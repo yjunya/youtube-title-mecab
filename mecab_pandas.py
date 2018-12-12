@@ -19,7 +19,7 @@ class MeCabParser:
         ENV = os.environ['DEVELOP_ENV']
         if ENV == "local":
             neolog_dir = subprocess.getoutput("echo `mecab-config --dicdir`\"/mecab-ipadic-neologd\"")
-        if ENV == "deploy":
+        else:
             neolog_dir = "/app/.linuxbrew/lib/mecab/dic/mecab-ipadic-neologd"
         self.mecab = MeCab.Tagger("-d {}".format(neolog_dir))
 
