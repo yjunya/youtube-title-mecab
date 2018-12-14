@@ -4,10 +4,8 @@ import networkx as nx
 import random
 from mecab_pandas import MeCabParser
 from apiclient.discovery import build
-from flask import Flask, jsonify, abort, make_response
+from flask import Flask, jsonify, abort, make_response, request
 from flask_cors import CORS
-
-
 
 
 # initial for check
@@ -23,6 +21,32 @@ def is_isetu(s):
 
 # initial for graph
 G = None
+
+#initial for youtube
+youtube = None
+
+# listのもっとも多い要素を返す
+def maxElem( lis ):
+  '''
+  与えられたリストの中に、最も多く存在する要素を返す
+  (最大の数の要素が複数ある場合、pythonのsetで先頭により近い要素を返す)
+  '''
+  L = lis[:]#copy
+  S = set(lis)
+  S = list(S)
+  MaxCount=0
+  ret='nothing...'
+
+  for elem in S:
+    c=0
+    while elem in L:
+      ind = L.index(elem)
+      foo = L.pop(ind)
+      c+=1
+    if c>MaxCount:
+      MaxCount=c
+      ret = elem
+  return ret
 
 
 # initial Flask
@@ -66,13 +90,15 @@ def random_select():
         return make_response(jsonify(result))
 
 # words of search
-@app.route('/search/<q>', methods=['GET'])
-def search(q):
+@app.route('/search', methods=['GET'])
+def search():
     #search query
-    YOUTUBE_API_KEY = os.environ['YOUTUBE_API_KEY']
-    youtube = build('youtube','v3',developerKey=YOUTUBE_API_KEY)
+    global youtube
+    if youtube == None:
+        YOUTUBE_API_KEY = os.environ['YOUTUBE_API_KEY']
+        youtube = build('youtube','v3',developerKey=YOUTUBE_API_KEY)
     mp = MeCabParser()
-    query = q
+    query = request.args.get('word')
 
     search_response = youtube.search().list(
         part='snippet',
@@ -82,8 +108,13 @@ def search(q):
     ).execute()
 
     word_of_movie = []
+    movieIDs = []
+    movieIDs_text = ""
+
 
     for item in search_response['items']:
+        # get_movieIDs for get category
+        movieIDs.append(item['id']['videoId'])
         title = item['snippet']['title']
 
         try:
@@ -134,11 +165,55 @@ def search(q):
     if query in result:
         result.remove(query)
         result.insert(0, query)
-        return make_response(jsonify(result))
     else:
         result.insert(0, query)
         result.pop(-1)
-        return make_response(jsonify(result))
+
+    # get_category
+    for movieID in movieIDs:
+        movieIDs_text += movieID
+        movieIDs_text += ","
+
+    search_response = youtube.videos().list(
+        part='snippet',
+        id=movieIDs_text
+    ).execute()
+
+    categoryIDs = []
+
+    for item in search_response['items']:
+        categoryIDs.append(item['snippet']['categoryId'])
+
+    final_result = {"words":result ,"categoryId":maxElem(categoryIDs) }
+    return make_response(jsonify(final_result))
+
+# get movie
+@app.route('/movie', methods=['GET'])
+def get_movie():
+
+    words = request.args.getlist('words')
+
+    query = ""
+    for word in words:
+        query += word
+        query += " "
+
+    YOUTUBE_API_KEY = os.environ['YOUTUBE_API_KEY']
+    youtube = build('youtube','v3',developerKey=YOUTUBE_API_KEY)
+
+    movieIDs = []
+
+    search_response = youtube.search().list(
+        part='id',
+        q=query,
+        type='video',
+        maxResults=5
+    ).execute()
+
+    for item in search_response['items']:
+        movieIDs.append(item['id']['videoId'])
+
+    result = {"url":movieIDs }
 
     return make_response(jsonify(result))
 
