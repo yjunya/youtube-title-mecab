@@ -213,7 +213,9 @@ def get_movie():
     for item in search_response['items']:
         movieIDs.append(item['id']['videoId'])
 
-    return make_response(jsonify(movieIDs))
+    result = {"url":movieIDs }
+
+    return make_response(jsonify(result))
 
 
 # error
