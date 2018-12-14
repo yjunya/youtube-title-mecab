@@ -112,7 +112,6 @@ def search():
     movieIDs = []
     movieIDs_text = ""
 
-
     for item in search_response['items']:
         # get_movieIDs for get category
         movieIDs.append(item['id']['videoId'])
