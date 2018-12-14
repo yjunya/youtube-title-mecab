@@ -16,6 +16,7 @@ class MeCabParser:
 
     def __init__(self) -> None:
         """Neologdが存在するディレクトリを探し、MeCabのParserを定義する."""
+
         ENV = os.environ['DEVELOP_ENV']
         if ENV == "local":
             neolog_dir = subprocess.getoutput("echo `mecab-config --dicdir`\"/mecab-ipadic-neologd\"")
