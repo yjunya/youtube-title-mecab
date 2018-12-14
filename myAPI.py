@@ -83,11 +83,12 @@ def random_select():
     if random_word in result:
         result.remove(random_word)
         result.insert(0, random_word)
-        return make_response(jsonify(result))
     else:
         result.insert(0, random_word)
         result.pop(-1)
-        return make_response(jsonify(result))
+
+    final_result = {"words":result ,"categoryId":"0" }
+    return make_response(jsonify(final_result))
 
 # words of search
 @app.route('/search', methods=['GET'])
@@ -110,7 +111,6 @@ def search():
     word_of_movie = []
     movieIDs = []
     movieIDs_text = ""
-
 
     for item in search_response['items']:
         # get_movieIDs for get category
