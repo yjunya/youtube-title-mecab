@@ -207,7 +207,7 @@ def get_movie():
         part='id',
         q=query,
         type='video',
-        maxResults=5
+        maxResults=5,
     ).execute()
 
     for item in search_response['items']:
