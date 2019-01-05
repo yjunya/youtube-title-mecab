@@ -15,7 +15,7 @@ def is_kusa(s):
 alnumReg = re.compile(r'^[a-zA-Z0-9]+$')
 def isalnum(s):
     return alnumReg.match(s) is not None
-isetu = re.compile(r'^い説$')
+isetu = re.compile(r'^(い説|る説)$')
 def is_isetu(s):
     return isetu.match(s) is not None
 
@@ -124,10 +124,11 @@ def search():
 
 
         for i in range(len(df)):
-            if is_kusa(df['surface_form'][i]) == True:
-                df['surface_form'][i] = "草(www)"
+#            if is_kusa(df['surface_form'][i]) == True:
+#                df['surface_form'][i] = "草(www)"
 
-            if df['word_class'][i] == "名詞" and df['class_detail1'][i] != "非自立" and df['class_detail1'][i] != "数" and isalnum(df['surface_form'][i]) == False:
+#            if df['word_class'][i] == "名詞" and df['class_detail1'][i] != "非自立" and df['class_detail1'][i] != "数" and isalnum(df['surface_form'][i]) == False:
+            if df['word_class'][i] == "名詞" and df['class_detail1'][i] != "非自立" and df['class_detail1'][i] != "数" and df['class_detail1'][i] != "接尾" and df['class_detail1'][i] != "代名詞" and df['class_detail1'][i] != "接続詞的" and isalnum(df['surface_form'][i]) == False and is_kusa(df['surface_form'][i]) == False:
                 if is_isetu(df['surface_form'][i]) == True:
                     df['surface_form'][i] = "説"
 
