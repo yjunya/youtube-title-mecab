@@ -18,6 +18,9 @@ def isalnum(s):
 isetu = re.compile(r'^(い説|る説)$')
 def is_isetu(s):
     return isetu.match(s) is not None
+kanaLetterReg = re.compile(r'^[ぁ-んァ-ヴｦ-ﾟ]$')
+def isKanaLetter(s):
+    return kanaLetterReg.match(s) is not None
 
 # initial for graph
 G = None
@@ -128,7 +131,7 @@ def search():
 #                df['surface_form'][i] = "草(www)"
 
 #            if df['word_class'][i] == "名詞" and df['class_detail1'][i] != "非自立" and df['class_detail1'][i] != "数" and isalnum(df['surface_form'][i]) == False:
-            if df['word_class'][i] == "名詞" and df['class_detail1'][i] != "非自立" and df['class_detail1'][i] != "数" and df['class_detail1'][i] != "接尾" and df['class_detail1'][i] != "代名詞" and df['class_detail1'][i] != "接続詞的" and isalnum(df['surface_form'][i]) == False and is_kusa(df['surface_form'][i]) == False:
+            if df['word_class'][i] == "名詞" and df['class_detail1'][i] != "非自立" and df['class_detail1'][i] != "数" and df['class_detail1'][i] != "接尾" and df['class_detail1'][i] != "代名詞" and df['class_detail1'][i] != "接続詞的" and isalnum(df['surface_form'][i]) == False and is_kusa(df['surface_form'][i]) == False and isKanaLetter(df['surface_form'][i]) == False:
                 if is_isetu(df['surface_form'][i]) == True:
                     df['surface_form'][i] = "説"
 
