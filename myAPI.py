@@ -9,15 +9,15 @@ from flask_cors import CORS
 
 
 # initial for check
-kusa = re.compile(r'^[wWｗＷ]+$')
-def is_kusa(s):
-    return kusa.match(s) is not None
+laughReg = re.compile(r'^([wWｗＷ]+|草(www))$')
+def isLaugh(s):
+    return laughReg.match(s) is not None
 alnumReg = re.compile(r'^[a-zA-Z0-9]+$')
-def isalnum(s):
+def isAlnum(s):
     return alnumReg.match(s) is not None
-isetu = re.compile(r'^(い説|る説)$')
-def is_isetu(s):
-    return isetu.match(s) is not None
+theoryReg = re.compile(r'^(説|い説|る説)$')
+def isTheory(s):
+    return theoryReg.match(s) is not None
 kanaLetterReg = re.compile(r'^[ぁ-んァ-ヴｦ-ﾟ]$')
 def isKanaLetter(s):
     return kanaLetterReg.match(s) is not None
@@ -50,7 +50,6 @@ def maxElem( lis ):
       MaxCount=c
       ret = elem
   return ret
-
 
 # initial Flask
 app = Flask(__name__)
@@ -125,16 +124,8 @@ def search():
         except:
             continue
 
-
         for i in range(len(df)):
-#            if is_kusa(df['surface_form'][i]) == True:
-#                df['surface_form'][i] = "草(www)"
-
-#            if df['word_class'][i] == "名詞" and df['class_detail1'][i] != "非自立" and df['class_detail1'][i] != "数" and isalnum(df['surface_form'][i]) == False:
-            if df['word_class'][i] == "名詞" and df['class_detail1'][i] != "非自立" and df['class_detail1'][i] != "数" and df['class_detail1'][i] != "接尾" and df['class_detail1'][i] != "代名詞" and df['class_detail1'][i] != "接続詞的" and isalnum(df['surface_form'][i]) == False and is_kusa(df['surface_form'][i]) == False and isKanaLetter(df['surface_form'][i]) == False:
-                if is_isetu(df['surface_form'][i]) == True:
-                    df['surface_form'][i] = "説"
-
+            if df['word_class'][i] == "名詞" and df['class_detail1'][i] != "非自立" and df['class_detail1'][i] != "数" and df['class_detail1'][i] != "接尾" and df['class_detail1'][i] != "代名詞" and df['class_detail1'][i] != "接続詞的" and isAlnum(df['surface_form'][i]) == False and isLaugh(df['surface_form'][i]) == False and isKanaLetter(df['surface_form'][i]) == False and isTheory(df['surface_form'][i]) == False:
                 word_of_movie.append(df['surface_form'][i])
 
     #create graph H
@@ -220,7 +211,6 @@ def get_movie():
     result = {"url":movieIDs }
 
     return make_response(jsonify(result))
-
 
 # error
 @app.errorhandler(404)
